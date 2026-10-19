@@ -147,9 +147,8 @@ public:
             else if (nalu_type == webrtc::H264::NaluType::kSei)
             {
             }
-			else if (nalu_type == webrtc::H264::NaluType::kAud)
+            else if (nalu_type == webrtc::H264::NaluType::kAud)
             {
-				
             }
             else
             {
@@ -308,6 +307,15 @@ public:
     {
         int64_t ts = presentationTime.tv_sec;
         ts = ts * 1000 + presentationTime.tv_usec / 1000;
+        int64_t adjustedTs = ts + m_tsOffset;
+        if (m_lastOutTs != 0 && adjustedTs < m_lastOutTs)
+        {
+            m_tsOffset = m_lastOutTs + 1 - ts;
+            RTC_LOG(LS_INFO) << "LiveVideoSource:onData timestamp went backwards, rebasing offset:" << m_tsOffset;
+            adjustedTs = ts + m_tsOffset;
+        }
+        m_lastOutTs = adjustedTs;
+        ts = adjustedTs;
         RTC_LOG(LS_VERBOSE) << "LiveVideoSource:onData id:" << id << " size:" << size << " ts:" << ts;
         int res = 0;
 
@@ -351,4 +359,6 @@ private:
     std::map<std::string, std::string> m_codec;
 
     uint64_t                           m_prevTimestamp;
+    int64_t                            m_tsOffset = 0;
+    int64_t                            m_lastOutTs = 0;
 };
