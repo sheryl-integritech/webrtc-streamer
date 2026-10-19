@@ -63,7 +63,7 @@ public:
     {
         RTC_LOG(LS_INFO) << "LiveVideoSource::stop";
         m_liveclient.stop();
-        m_env.stop();
+        m_env.taskScheduler().scheduleDelayedTask(0, [](void* env) { static_cast<Environment*>(env)->stop(); }, &m_env);
         m_capturethread.join();
     }
     bool IsRunning() { return (m_stop == 0); }
