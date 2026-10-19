@@ -147,6 +147,9 @@ public:
             else if (nalu_type == webrtc::H264::NaluType::kSei)
             {
             }
+			else if (nalu_type == webrtc::H264::NaluType::kAud)
+            {
+            }
             else
             {
                 if (nalu_type == webrtc::H264::NaluType::kIdr)
